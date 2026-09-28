@@ -27,8 +27,8 @@ go.work.sum
 # env file
 .env
 
-# Local executable built on Unix
-mmvalidator
+# Local executable built on Unix (only at the repository root)
+/mmvalidator
 
 # Editor/IDE
 # .idea/
