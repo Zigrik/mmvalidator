@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#0d63d7">
+  <meta name="description" content="Пакетная проверка криптографической части кодов маркировки">
+  <title>MM Validator</title>
+  <link rel="icon" type="image/png" sizes="256x256" href="/static/mmvalidator-icon-256.png">
+  <link rel="shortcut icon" href="/static/favicon.ico">
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="page-glow page-glow-one"></div>
+  <div class="page-glow page-glow-two"></div>
+
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="MM Validator — главная">
+        <img src="/static/mmvalidator-icon-256.png" alt="" width="56" height="56">
+        <span>
+          <strong>MM Validator</strong>
+          <small>Проверка кодов маркировки</small>
+        </span>
+      </a>
+      <div class="rate-badge" title="Глобальное ограничение частоты запросов">
+        <span class="pulse-dot"></span>
+        1 запрос / сек
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <div class="hero-copy">
+          <span class="eyebrow">Криптографическая проверка</span>
+          <h1>Проверьте маркировку<br><span>быстро и точно</span></h1>
+          <p>Загрузите до 400&nbsp;000 кодов. Повторы будут объединены, а номера исходных строк сохранятся в результате.</p>
+        </div>
+        <div class="hero-mark" aria-hidden="true">
+          <img src="/static/mmvalidator-icon-256.png" alt="">
+        </div>
+      </section>
+
+      <section class="card input-card" aria-labelledby="input-title">
+        <div class="section-heading">
+          <div class="step">01</div>
+          <div>
+            <span class="eyebrow">Исходные данные</span>
+            <h2 id="input-title">Добавьте коды</h2>
+          </div>
+        </div>
+
+        <div class="input-grid">
+          <div class="text-input-area">
+            <div class="field-heading">
+              <label for="codes">Список кодов</label>
+              <span>Одна строка — одна марка</span>
+            </div>
+            <textarea id="codes" rows="12" spellcheck="false" placeholder="0104601234567890...&#10;0104601234567891... BATCH-123"></textarea>
+            <p class="field-help">После пробела можно указать артикул, партию или другой признак.</p>
+          </div>
+
+          <div class="upload-column">
+            <div id="drop" class="drop" tabindex="0" role="button" aria-label="Загрузить CSV или TXT файл">
+              <input id="file" type="file" accept=".csv,.txt" hidden>
+              <div class="upload-icon" aria-hidden="true">
+                <svg viewBox="0 0 24 24"><path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5M5 14v4a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-4"/></svg>
+              </div>
+              <strong>Перетащите файл сюда</strong>
+              <span>или нажмите, чтобы выбрать</span>
+              <small>CSV или TXT · до 400&nbsp;000 строк</small>
+            </div>
+            <div id="fileInfo" class="file-info hidden">
+              <span class="file-icon">✓</span>
+              <span><strong id="fileName"></strong><small id="fileSize"></small></span>
+              <button id="clearFile" class="icon-button" type="button" aria-label="Убрать файл">×</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="credentialWrap" class="credential hidden">
+          <div>
+            <label for="credential">API token</label>
+            <span>Токен используется только для текущей проверки и не сохраняется.</span>
+          </div>
+          <input id="credential" type="password" autocomplete="off" placeholder="Вставьте Bearer token">
+        </div>
+
+        <div class="form-footer">
+          <p id="note" class="note" role="status" aria-live="polite"></p>
+          <div class="button-row">
+            <button id="cancel" class="button secondary hidden" type="button">
+              <span>Отменить</span>
+            </button>
+            <button id="start" class="button primary" type="button">
+              <span>Начать проверку</span>
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14m-5-5 5 5-5 5"/></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <section id="progress" class="card progress-card hidden" aria-labelledby="progress-title">
+        <div class="progress-top">
+          <div>
+            <span class="eyebrow">Текущая задача</span>
+            <h2 id="progress-title">Проверка кодов</h2>
+          </div>
+          <span id="jobState" class="status-pill">В очереди</span>
+        </div>
+        <div class="progress-line">
+          <div class="bar"><i></i></div>
+          <strong id="progressPercent">0%</strong>
+        </div>
+        <div class="stats-grid">
+          <div><span>Всего строк</span><strong id="statTotal">0</strong></div>
+          <div><span>Уникальных</span><strong id="statUnique">0</strong></div>
+          <div><span>Проверено</span><strong id="statChecked">0</strong></div>
+          <div class="positive"><span>Валидных</span><strong id="statValid">0</strong></div>
+          <div class="negative"><span>Невалидных</span><strong id="statInvalid">0</strong></div>
+          <div class="warning"><span>Ошибок</span><strong id="statErrors">0</strong></div>
+        </div>
+      </section>
+
+      <section id="results" class="card results-card hidden" aria-labelledby="results-title">
+        <div class="results-heading">
+          <div>
+            <span class="eyebrow">Результат</span>
+            <h2 id="results-title">Невалидные марки</h2>
+          </div>
+          <div class="download-row">
+            <a id="errorCSV" class="button download secondary hidden">CSV с ошибками</a>
+            <a id="invalidCSV" class="button download primary">Скачать CSV</a>
+          </div>
+        </div>
+        <div id="emptyResult" class="empty-result hidden">
+          <span>✓</span>
+          <strong>Невалидных марок не найдено</strong>
+        </div>
+        <div id="resultTable" class="table-wrap">
+          <table>
+            <thead><tr><th>Марка</th><th>Признак</th><th>Строки</th><th>Причина</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="footer-brand"><img src="/static/mmvalidator-icon-256.png" alt="" width="28" height="28"><span><strong>MM Validator</strong> <b>v1.0.0</b></span></div>
+      <a href="/static/favicon.ico" download="MM-Validator.ico">Скачать иконку для ярлыка</a>
+    </footer>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

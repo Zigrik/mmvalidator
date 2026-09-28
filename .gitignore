@@ -27,6 +27,9 @@ go.work.sum
 # env file
 .env
 
+# Local executable built on Unix
+mmvalidator
+
 # Editor/IDE
 # .idea/
 # .vscode/
